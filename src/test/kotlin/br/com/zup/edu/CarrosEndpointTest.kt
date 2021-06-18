@@ -10,6 +10,7 @@ import io.micronaut.grpc.annotation.GrpcChannel
 import io.micronaut.grpc.server.GrpcServerChannel
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import javax.inject.Singleton
@@ -20,10 +21,13 @@ internal class CarrosEndpointTest(
     val carrosRepository: CarroRepository
 ) {
 
+    @BeforeEach
+    fun setup(){
+        carrosRepository.deleteAll()
+    }
+
     @Test
     fun `Deve adicionar um novo carro`(){
-
-        carrosRepository.deleteAll()
         val response = grpcClient.adicionar(CarroRequest.newBuilder()
             .setModelo("Gol")
             .setPlaca("HPX-1234")
@@ -40,7 +44,6 @@ internal class CarrosEndpointTest(
     @Test
     fun `Nao deve adicionar novo carro quando placa ja for existente`() {
 
-       //cenario
         val existente = carrosRepository.save(Carro("Gol", "OTZ-0004"))
         //ação
         val error = assertThrows<StatusRuntimeException> {
@@ -62,17 +65,10 @@ internal class CarrosEndpointTest(
     @Test
     fun `Nao deve adicionar novo carro quando dados de entrada forem invalidos`() {
 
-        //Cenário
-        carrosRepository.deleteAll()
-
         //Ação
         val error = assertThrows<StatusRuntimeException> { //Para pegar a excepion
-            grpcClient.adicionar(
-                CarroRequest.newBuilder()
-                    .setModelo("")
-                    .setPlaca("")
-                    .build()
-            )
+            grpcClient.adicionar(CarroRequest.newBuilder().build())
+
         }
 
         //Validação
