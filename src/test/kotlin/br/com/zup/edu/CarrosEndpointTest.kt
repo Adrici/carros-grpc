@@ -1,6 +1,5 @@
 package br.com.zup.edu
 
-
 import carros.Carro
 import carros.CarroRepository
 import io.grpc.Channel
@@ -11,7 +10,6 @@ import io.micronaut.grpc.annotation.GrpcChannel
 import io.micronaut.grpc.server.GrpcServerChannel
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import javax.inject.Singleton
@@ -22,15 +20,10 @@ internal class CarrosEndpointTest(
     val carrosRepository: CarroRepository
 ) {
 
-    @BeforeEach
-    internal fun setUp() {
-        carrosRepository.deleteAll()
-    }
-
-
     @Test
     fun `Deve adicionar um novo carro`(){
 
+        carrosRepository.deleteAll()
         val response = grpcClient.adicionar(CarroRequest.newBuilder()
             .setModelo("Gol")
             .setPlaca("HPX-1234")
@@ -48,8 +41,7 @@ internal class CarrosEndpointTest(
     fun `Nao deve adicionar novo carro quando placa ja for existente`() {
 
        //cenario
-        val existente = carrosRepository.save(Carro("Golzin", "OTZ-0004"))
-
+        val existente = carrosRepository.save(Carro("Gol", "OTZ-0004"))
         //ação
         val error = assertThrows<StatusRuntimeException> {
             grpcClient.adicionar(
@@ -70,18 +62,23 @@ internal class CarrosEndpointTest(
     @Test
     fun `Nao deve adicionar novo carro quando dados de entrada forem invalidos`() {
 
-        val error = assertThrows<StatusRuntimeException> {
+        //Cenário
+        carrosRepository.deleteAll()
+
+        //Ação
+        val error = assertThrows<StatusRuntimeException> { //Para pegar a excepion
             grpcClient.adicionar(
                 CarroRequest.newBuilder()
-                    .setModelo("EcoSport")
+                    .setModelo("")
                     .setPlaca("")
                     .build()
             )
         }
 
+        //Validação
         with(error) {
             assertEquals(Status.INVALID_ARGUMENT.code, this.status.code)
-            assertEquals("Dados de entrada inválidos", this.status.description)
+            assertEquals("dados de entrada inválidos", this.status.description)
         }
     }
 
