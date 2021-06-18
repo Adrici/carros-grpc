@@ -3,4 +3,4 @@ defaultPackage: br.com.zup.edu
 testFramework: junit
 sourceLanguage: kotlin
 buildTool: gradle
-features: [annotation-api, app-name, data, data-jpa, gradle, grpc, h2, jdbc-hikari, junit, kotlin, kotlin-application, logback, readme, shade, yaml]
+features: [annotation-api, app-name, data, data-jpa, gradle, grpc, h2, mysql, jdbc-hikari, junit, kotlin, kotlin-application, logback, readme, shade, yaml]
